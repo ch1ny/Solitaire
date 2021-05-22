@@ -11,7 +11,7 @@ import main.java.Util.Stack;
  */
 public class StairStack {
 
-    private static Stack<Poker> pokers;
+    private Stack<Poker> pokers;
 
     public StairStack() {
         pokers = new Stack<>();
@@ -22,6 +22,21 @@ public class StairStack {
         pokers.push(poker);
     }
 
+    public boolean add(Poker poker) {
+        if (top().getValue() - 1 == poker.getValue()) {
+            if ((Poker.Suit.valueOf(String.valueOf(top().getSuit())).ordinal() % 2) == (Poker.Suit.valueOf(String.valueOf(poker.getSuit())).ordinal() % 2)) {
+                System.out.println("花色不对！");
+                return false;
+            } else {
+                pokers.push(poker);
+                return true;
+            }
+        } else {
+            System.out.println("牌号不对！");
+            return false;
+        }
+    }
+
     // 从牌堆中移出扑克牌
     public Poker leave() {
         Poker poker = pokers.pop();
@@ -29,11 +44,23 @@ public class StairStack {
     }
 
     public Poker top() {
-        return pokers.top();
+        if (pokers.isEmpty()) {
+            return null;
+        } else {
+            return pokers.top();
+        }
     }
 
     public int length() {
         return pokers.size();
+    }
+
+    public int indexOf(Poker poker) {
+        int i = pokers.lastIndexOf(poker);
+        if (i >= 0) {
+            return length() - i;
+        }
+        return -1;
     }
 
 }

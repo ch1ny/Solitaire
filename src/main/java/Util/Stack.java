@@ -30,7 +30,7 @@ public class Stack<E> extends Vector<E> {
 
     public synchronized E pop() {
         E item = top();
-        removeElement(item);
+        removeElementAt(size() - 1);
         return item;
     }
 

@@ -11,9 +11,9 @@ import main.java.Util.Stack;
  */
 public class DiscardStack {
 
-    private static Poker.Suit suit;
-    private static Stack<Poker> disPoker;
-    private static int top; // 栈顶牌号
+    private Poker.Suit suit;
+    private Stack<Poker> disPoker;
+    private int top; // 栈顶牌号
 
     public DiscardStack() {
         suit = null;
@@ -22,20 +22,21 @@ public class DiscardStack {
     }
 
     // 向牌堆中置入扑克牌
-    public void push(Poker Poker) {
+    public boolean push(Poker Poker) {
         if (suit == null) {
             suit = Poker.getSuit();
         } else if (suit != Poker.getSuit()) {
             System.out.println("花色不匹配！");
-            return;
+            return false;
         }
         if (top + 1 == Poker.getValue()) {
             disPoker.push(Poker);
             top++;
         } else {
             System.out.println("牌号不对！");
-            return;
+            return false;
         }
+        return true;
     }
 
     // 从牌堆中移出扑克牌

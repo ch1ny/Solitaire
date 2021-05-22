@@ -1,6 +1,7 @@
 package main.java.Game;
 
 import main.java.Component.Poker;
+import main.java.MainFrame;
 import main.java.Util.Queue;
 
 /**
@@ -19,11 +20,34 @@ public class DeckQueue {
         recycle = new Queue<>();
     }
 
+    public int cycleLayer() {
+        if (recycle.isEmpty()) {
+            return 0;
+        } else {
+            return MainFrame.getPane().getLayer(recycle.back());
+        }
+    }
+
     // 发牌
-    public Poker deal() {
-        Poker Poker = deck.pop();
-        recycle.push(Poker);
-        return Poker;
+    public void deal(Poker poker) {
+        recycle.push(poker);
+    }
+
+    public void deal() {
+        Poker deal = deck.pop();
+        deal.setRole("deckOff,1");
+        deal.setXY(111, 20);
+        deal.setLocation(111, 20);
+        deal.seen();
+        MainFrame.getPane().setLayer(deal, cycleLayer() + 1);
+        recycle.push(deal);
+    }
+
+    public Poker front() {
+        if (!deck.isEmpty()) {
+            return deck.pop();
+        }
+        return null;
     }
 
     // 回收牌堆

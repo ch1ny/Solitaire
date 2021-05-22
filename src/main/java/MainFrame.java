@@ -4,6 +4,8 @@ import main.java.Game.Game;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @Author SDU德布罗煜
@@ -23,10 +25,11 @@ public class MainFrame extends JFrame {
         frame.setLayout(null);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize((int) (width * 0.8), (int) (height * 0.8));
+        frame.setSize((int) (width * 0.6), (int) (height * 0.6));
         frame.setLocationRelativeTo(null);//窗体居中显示
         frame.setIconImage(Toolkit.getDefaultToolkit().createImage("res/icon/logo.png"));
         pane = new JLayeredPane();
+        pane.setOpaque(true); // JLayeredPane默认是透明的，所以将其设置为非透明，否则设置背景色是没有意义的
         pane.setBackground(new Color(0,75,0));
         frame.setContentPane(pane);
         Game.gameInit();
