@@ -3,6 +3,8 @@ package main.java.Game;
 import main.java.Component.Poker;
 import main.java.Util.Stack;
 
+import java.util.Iterator;
+
 /**
  * @Author SDU德布罗煜
  * @Date 2021/5/21 20:52
@@ -20,6 +22,12 @@ public class StairStack {
     // 向牌堆中置入扑克牌
     public void push(Poker poker) {
         pokers.push(poker);
+        /**
+         * @Author SDU边路刘德华
+         */
+        for(int q = 1; q < poker.getPokerindex(); q++) {
+            pokers.push(poker.getNextCard()[q]);
+        }
     }
 
     public boolean add(Poker poker) {
@@ -28,6 +36,16 @@ public class StairStack {
                 System.out.println("花色不对！");
                 return false;
             } else {
+                for (Iterator<Poker> iter = pokers.iterator(); iter.hasNext();) {
+                    Poker tmp = iter.next();
+                    if (tmp.isSeen()) {
+                        tmp.addPokerindex(poker.getPokerindex());
+                        tmp.addNextPocker(poker);
+                        for(int q = 1;q < poker.getPokerindex(); q++) {
+                            tmp.addNextPocker(poker.getNextCard()[q]);
+                        }
+                    }
+                }
                 pokers.push(poker);
                 return true;
             }
@@ -40,6 +58,17 @@ public class StairStack {
     // 从牌堆中移出扑克牌
     public Poker leave() {
         Poker poker = pokers.pop();
+        return poker;
+    }
+
+    /**
+     * @Author SDU边路刘德华
+     * @Description 从牌堆中移出扑克牌
+     */
+    public Poker leave(Poker poker) {
+        for(int q=1;q<poker.getPokerindex();q++) {
+            Poker poker1 = pokers.pop();
+        }
         return poker;
     }
 
@@ -61,6 +90,24 @@ public class StairStack {
             return length() - i;
         }
         return -1;
+    }
+
+    public Poker search(int index) {
+        return pokers.get(index);
+    }
+
+    public void seen() {
+        Poker[] arr = new Poker[pokers.size()];
+        int i = 0;
+        for (Iterator<Poker> iter = pokers.iterator(); iter.hasNext();) {
+            arr[i++] = iter.next();
+        }
+        for (int j = i - 1; j >= 0; j--) {
+            if (!arr[j].isSeen()) {
+                arr[j].seen();
+                return;
+            }
+        }
     }
 
 }

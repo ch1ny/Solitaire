@@ -4,6 +4,8 @@ import main.java.Component.Poker;
 import main.java.MainFrame;
 import main.java.Util.Queue;
 
+import java.util.Iterator;
+
 /**
  * @Author SDU德布罗煜
  * @Date 2021/5/5 22:56
@@ -29,10 +31,6 @@ public class DeckQueue {
     }
 
     // 发牌
-    public void deal(Poker poker) {
-        recycle.push(poker);
-    }
-
     public void deal() {
         Poker deal = deck.pop();
         deal.setRole("deckOff,1");
@@ -52,8 +50,15 @@ public class DeckQueue {
 
     // 回收牌堆
     public void recycle() {
-        deck = recycle;
+        deck = (Queue<Poker>) recycle.clone();
         recycle.clear();
+        for (Iterator<Poker> iter = deck.iterator(); iter.hasNext();) {
+            Poker poker = iter.next();
+            poker.hidden();
+            poker.setRole("deck,1");
+            poker.setLocation(20, 20);
+            MainFrame.getPane().setLayer(poker, deck.indexOf(poker));
+        }
     }
 
     // 从回收牌堆取牌

@@ -1,11 +1,11 @@
 package main.java;
 
+import main.java.Component.MenuBar;
+import main.java.Component.Time;
 import main.java.Game.Game;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 /**
  * @Author SDU德布罗煜
@@ -31,8 +31,8 @@ public class MainFrame extends JFrame {
         pane = new JLayeredPane();
         pane.setOpaque(true); // JLayeredPane默认是透明的，所以将其设置为非透明，否则设置背景色是没有意义的
         pane.setBackground(new Color(0,75,0));
+        frame.setJMenuBar(new MenuBar());
         frame.setContentPane(pane);
-        Game.gameInit();
         frame.setVisible(true);
     }
 
@@ -40,6 +40,8 @@ public class MainFrame extends JFrame {
         return frame;
     }
 
-    public static JLayeredPane getPane() {return pane;}
+    public static JLayeredPane getPane() {
+        return pane;
+    }
 
 }
