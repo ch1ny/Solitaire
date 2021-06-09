@@ -1,8 +1,6 @@
 package main.java;
 
 import main.java.Component.MenuBar;
-import main.java.Component.Time;
-import main.java.Game.Game;
 
 import javax.swing.*;
 import java.awt.*;

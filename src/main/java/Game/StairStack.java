@@ -1,6 +1,7 @@
 package main.java.Game;
 
 import main.java.Component.Poker;
+import main.java.MainFrame;
 import main.java.Util.Stack;
 
 import java.util.Iterator;
@@ -22,31 +23,21 @@ public class StairStack {
     // 向牌堆中置入扑克牌
     public void push(Poker poker) {
         pokers.push(poker);
-        /**
-         * @Author SDU边路刘德华
-         */
-        for(int q = 1; q < poker.getPokerindex(); q++) {
-            pokers.push(poker.getNextCard()[q]);
-        }
     }
 
     public boolean add(Poker poker) {
-        if (top().getValue() - 1 == poker.getValue()) {
-            if ((Poker.Suit.valueOf(String.valueOf(top().getSuit())).ordinal() % 2) == (Poker.Suit.valueOf(String.valueOf(poker.getSuit())).ordinal() % 2)) {
+        if ( top() == null && poker.getValue() == 13 || top().getValue() - 1 == poker.getValue()) {
+            if (top() != null && (Poker.Suit.valueOf(String.valueOf(top().getSuit())).ordinal() % 2) == (Poker.Suit.valueOf(String.valueOf(poker.getSuit())).ordinal() % 2)) {
                 System.out.println("花色不对！");
                 return false;
             } else {
-                for (Iterator<Poker> iter = pokers.iterator(); iter.hasNext();) {
-                    Poker tmp = iter.next();
-                    if (tmp.isSeen()) {
-                        tmp.addPokerindex(poker.getPokerindex());
-                        tmp.addNextPocker(poker);
-                        for(int q = 1;q < poker.getPokerindex(); q++) {
-                            tmp.addNextPocker(poker.getNextCard()[q]);
-                        }
-                    }
+                push(poker);
+                StairStack stairStack = Game.getStair(Integer.parseInt(poker.getRole().split(",")[1]));
+                int myIndex = stairStack.indexOf(poker);
+                for (int i = 1; i < myIndex; i++) {
+                    int index = stairStack.length() - (myIndex - i);
+                    push(stairStack.get(index));
                 }
-                pokers.push(poker);
                 return true;
             }
         } else {
@@ -58,17 +49,6 @@ public class StairStack {
     // 从牌堆中移出扑克牌
     public Poker leave() {
         Poker poker = pokers.pop();
-        return poker;
-    }
-
-    /**
-     * @Author SDU边路刘德华
-     * @Description 从牌堆中移出扑克牌
-     */
-    public Poker leave(Poker poker) {
-        for(int q=1;q<poker.getPokerindex();q++) {
-            Poker poker1 = pokers.pop();
-        }
         return poker;
     }
 
@@ -92,7 +72,7 @@ public class StairStack {
         return -1;
     }
 
-    public Poker search(int index) {
+    public Poker get(int index) {
         return pokers.get(index);
     }
 

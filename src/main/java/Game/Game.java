@@ -149,4 +149,15 @@ public class Game {
         return stairs[i];
     }
 
+    public static void win() {
+        int total = 0;
+        for (int i = 0; i < 4; i++) {
+            total += discards[i].getTop();
+        }
+        if (total == 13 * 4) {
+            pause();
+            JOptionPane.showMessageDialog(null, "恭喜！您已获胜！" + timer.getText());
+        }
+    }
+
 }

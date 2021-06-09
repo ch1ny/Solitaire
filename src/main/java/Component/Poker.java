@@ -29,26 +29,6 @@ public class Poker extends JLabel {
     private String role; // 担任身份
     private int tmpLayer; // 原本的层数
 
-    /**
-     * @Author SDU边路刘德华
-     */
-    private Poker nextCard[]=null;
-    int nextsize = 1;
-    int pokerindex = 1;
-    public int getPokerindex() {
-        return pokerindex;
-    }
-    public void addPokerindex(int nextindex) {
-        pokerindex += nextindex;
-    }
-    public void addNextPocker(Poker poker) {
-        nextCard[nextsize]=poker;
-        nextsize++;
-    }
-    public Poker[] getNextCard() {
-        return nextCard;
-    }
-
     @Override
     public void setBounds(int x, int y, int width, int height) {
         reshape(x, y, width, height);
@@ -88,6 +68,11 @@ public class Poker extends JLabel {
                         Game.getDeck().recycle();
                     }
                 }
+                if (role.split(",")[0].equals("stair")) {
+                    for (int i = 0; i < Game.getStair(Integer.parseInt(role.split(",")[1])).length(); i++) {
+                        System.out.println(Game.getStair(Integer.parseInt(role.split(",")[1])).get(i).getValue());
+                    }
+                }
             }
 
             @Override
@@ -99,10 +84,18 @@ public class Poker extends JLabel {
                     int destY = Integer.parseInt(dest.split(",")[1]);
                     setLocation(destX, destY);
                     if (role.split(",")[0].equals("stair")) {
+                        StairStack stairStack = Game.getStair(Integer.parseInt(role.split(",")[1]));
+                        int myIndex = stairStack.indexOf(Poker.this);
                         if (destX != X || destY != Y) {
                             X = destX;
                             Y = destY;
                             tmpLayer = (Y - 200) / 15 + 1;
+                        }
+                        for (int i = 1; i < myIndex; i++) {
+                            int index = stairStack.length() - i;
+                            stairStack.get(index).setLocation(X,Y + 15 * (myIndex - i));
+                            stairStack.get(index).setXY(X,Y + 15 * (myIndex - i));
+                            MainFrame.getPane().setLayer(stairStack.get(index), tmpLayer + (myIndex - i));
                         }
                     } else if (role.split(",")[0].equals("discard")) {
                         X = destX;
@@ -110,41 +103,27 @@ public class Poker extends JLabel {
                         tmpLayer = value;
                     }
                     MainFrame.getPane().setLayer(Poker.this, tmpLayer);
-                    Component destination = MainFrame.getPane().getComponentAt(nowX + onPressX, nowY + onPressY);
-                    if (Poker.class.isInstance(destination)) {
-                        Poker poker = (Poker) destination;
-                        for (int i = 1; i < pokerindex; i++) {
-                            nextCard[i].setRole(poker.role);
-                            nextCard[i].setLocation(destX,destY + 15 * i);
-                            MainFrame.getPane().setLayer(nextCard[i], tmpLayer + i);
-                        }
-                    }
                 }
             }
         });
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (role.split(",")[0].equals("stair")) {
-                    StairStack stairStack = Game.getStair(Integer.parseInt(role.split(",")[1]));
-                }
                 if (Seen) {
                     nowX = getX() + e.getX() - onPressX;
                     nowY = getY() + e.getY() - onPressY;
                     setLocation(nowX, nowY);
                 }
-                for (int i = 1; i <pokerindex; i++) {
-                    nextCard[i].setLocation(nowX,nowY+15*i);
+                if (role.split(",")[0].equals("stair")) {
+                    StairStack stairStack = Game.getStair(Integer.parseInt(role.split(",")[1]));
+                    int myIndex = stairStack.indexOf(Poker.this);
+                    for (int i = 1; i < myIndex; i++) {
+                        int index = stairStack.length() - i;
+                        stairStack.get(index).setLocation(nowX,nowY + 15 * (myIndex - i));
+                    }
                 }
             }
         });
-        /**
-         * @Author SDU边路刘德华
-         */
-        nextCard=new Poker[14];
-        for(int k=0;k<14;k++) {
-            nextCard[k]=null;
-        }
     }
 
     public int getValue() {
@@ -171,6 +150,9 @@ public class Poker extends JLabel {
         int destY = Y;
         if (Poker.class.isInstance(destination)) {
             Poker poker = (Poker) destination;
+            if (poker == Poker.this) {
+                return destX + "," + destY;
+            }
             if (poker.role != null) {
                 String where = poker.role.split(",")[0];
                 int index = Integer.parseInt(poker.role.split(",")[1]);
@@ -178,28 +160,16 @@ public class Poker extends JLabel {
                     case "stair": // 试图将扑克牌移入阶梯牌堆
                         StairStack stairStack = Game.getStair(index);
                         Poker top = stairStack.top();
-                        if (top == null && Poker.this.value == 13) {
-                            if (Poker.this.role.split(",")[0].equals("deckOff")) {
-                                Game.getDeck().getPoker();
-                            } else {
-                                StairStack stair = Game.getStair(Integer.parseInt(role.split(",")[1]));
-                                for (int i = 0; i < pokerindex; i++) {
-                                    Poker stairTop = stair.leave();
-                                    stairTop.setRole("stair," + index);
-                                }
-                                if (stair.length() > 0 && !stair.top().isSeen()) {
-                                    stair.seen();
-                                }
-                            }
+                        if (top == null && Poker.this.value == 13 && Poker.this.role.split(",")[0].equals("deckOff")) {
                             stairStack.push(Poker.this);
                             role = "stair," + index;
-                            destX = 20 + index * 91;
-                            destY = 200;
+                            Game.getDeck().getPoker();
                         } else if (stairStack.add(Poker.this)) {
                             switch (role.split(",")[0]) {
                                 case "stair":
                                     StairStack stair = Game.getStair(Integer.parseInt(role.split(",")[1]));
-                                    for (int i = 0; i < pokerindex; i++) {
+                                    int myIndex = stair.indexOf(Poker.this);
+                                    for (int i = 0; i < myIndex; i++) {
                                         Poker stairTop = stair.leave();
                                         stairTop.setRole("stair," + index);
                                     }
@@ -211,7 +181,11 @@ public class Poker extends JLabel {
                                     Poker deck = Game.getDeck().getPoker();
                                     deck.setRole("stair," + index);
                             }
-                            role = top.role;
+                        }
+                        if (top == null) {
+                            destX = 20 + 91 * index;
+                            destY = 200;
+                        } else {
                             destX = top.getX();
                             destY = top.getY() + 15;
                         }
@@ -222,7 +196,8 @@ public class Poker extends JLabel {
                             switch (role.split(",")[0]) {
                                 case "stair":
                                     StairStack stair = Game.getStair(Integer.parseInt(role.split(",")[1]));
-                                    for (int i = 0; i < pokerindex; i++) {
+                                    int myIndex = stair.indexOf(Poker.this);
+                                    for (int i = 0; i < myIndex; i++) {
                                         Poker stairTop = stair.leave();
                                         stairTop.setRole("discard," + index);
                                     }
@@ -237,6 +212,7 @@ public class Poker extends JLabel {
                             role = poker.role;
                             destX = poker.getX();
                             destY = poker.getY();
+                            Game.win();
                         }
                         Seen = false; // 禁止再次移动
                         break;
@@ -257,6 +233,10 @@ public class Poker extends JLabel {
 
     public void setRole(String str) {
         role = str;
+    }
+
+    public String getRole() {
+        return role;
     }
 
 }
